@@ -66,6 +66,8 @@ public class verifySenhas {
         password.append(rndmChar(MAIUSCULA));
         password.append(rndmChar(ESPECIAIS));
         password.append(rndmChar(NUMEROS));
+        password.append(rndmChar(ESPECIAIS));
+        password.append(rndmChar(NUMEROS));
 
 
         for (int i = password.length(); i < lngth; i++) {
@@ -119,11 +121,6 @@ public class verifySenhas {
             System.out.println("É forte? " + isPwStrong(senhaGerada));
         }
         // corrigir else e else if para o programa fechar somente quando a necessidade for suprida. O objetivo vai ser evitar mensagem de erro por algo que pode casualmente acontecer (Digitar um número >8 por desatenção ao aviso).
-        else{
-            System.out.println("Primeiro selecione uma opção entre 1 e 2.");
-        }
-        
-
         sc.close();
     }
 }
