@@ -80,6 +80,7 @@ public class verifySenhas {
         return conjunto.charAt(indice);
     }
 
+    // Embaralha os caracteres da senha com trocas aleatórias e retorna uma nova String.
     private static String mix (String text){
         char[] caracteres = text.toCharArray();
 
