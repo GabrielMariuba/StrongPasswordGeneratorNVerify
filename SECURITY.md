@@ -19,7 +19,7 @@ Este documento descreve como reportar vulnerabilidades no **StrongPasswordGenera
 
 **Não abra uma issue pública** para problemas de segurança.
 
-Envie um e-mail para: **`SEU-EMAIL@exemplo.com`** *(substitua por um contato real)*
+Envie um e-mail para: **`mariubacode@gmail.com`**
 
 Se o recurso de relato privado de vulnerabilidades estiver habilitado no repositório (aba **Security** do GitHub), você também pode usá-lo.
 
