@@ -117,17 +117,37 @@ public class verifySenhas {
                 break;
 
             case "2":
-                System.out.print("Digite o tamanho desejado (mínimo 8, Enter para usar 12): ");
+            int tamanho;
+            while (true) { 
+                System.out.println("Digite o tamanho desejado (min: 8, ENTER: 12): ");
                 String entradaTamanho = sc.nextLine();
-                int tamanho = entradaTamanho.isBlank()
-                    ? TAMANHO_PADRAO 
-                    : Integer.parseInt(entradaTamanho);
-
-                String senhaGerada = genStrongPw(tamanho);
-                System.out.println("\nSenha sugerida: " + senhaGerada);
-                System.out.println("É forte? " + isPwStrong(senhaGerada));
-                opcaoValida = true;
+            
+            
+            if(entradaTamanho.isBlank()){
+                tamanho = TAMANHO_PADRAO;
                 break;
+            }
+
+            try{
+                tamanho = Integer.parseInt(entradaTamanho);
+            } catch (NumberFormatException erro){
+                System.out.println("Digite um número inteiro válido.");
+                continue;
+            }
+
+            if(tamanho<8){
+                System.out.println("O tamanho mínimo é 8 caracteres.");
+                continue;
+            }
+            break;
+        }
+
+            String senhaGerada = genStrongPw(tamanho);
+            System.out.println("\nSenha sugerida: " + senhaGerada);
+            System.out.println("É forte? " + isPwStrong(senhaGerada));
+            opcaoValida = true;
+            break;
+            
 
            default:
                 System.out.println("Escolha uma opção entre 1 e 2.");
