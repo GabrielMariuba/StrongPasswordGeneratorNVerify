@@ -120,10 +120,10 @@ O projeto funciona, mas estes pontos ainda precisam de correção:
 
 **Menu e entrada do usuário (`main`)**
 
-- [ ] O programa **encerra após uma única ação**. Não há laço: ele deveria só fechar quando a necessidade do usuário for atendida.
-- [ ] Uma **opção inválida** no menu não gera nenhuma resposta; o programa apenas termina.
-- [ ] Digitar um tamanho **menor que 8** na geração faz o programa encerrar com erro (`IllegalArgumentException` sem tratamento). O ideal é avisar e pedir o valor de novo, para não gerar erro por uma distração simples.
-- [ ] Digitar algo que **não seja número** como tamanho causa `NumberFormatException` sem tratamento.
+- [x] O programa **encerra após uma única ação**. Não há laço: ele deveria só fechar quando a necessidade do usuário for atendida.
+- [x] Uma **opção inválida** no menu não gera nenhuma resposta; o programa apenas termina.
+- [x] Digitar um tamanho **menor que 8** na geração faz o programa encerrar com erro (`IllegalArgumentException` sem tratamento). O ideal é avisar e pedir o valor de novo, para não gerar erro por uma distração simples.
+- [x] Digitar algo que **não seja número** como tamanho causa `NumberFormatException` sem tratamento.
 
 **Validação**
 
