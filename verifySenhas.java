@@ -98,29 +98,42 @@ public class verifySenhas {
     
    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
+        boolean opcaoValida = false;
 
-        System.out.println("1 - Verificar uma senha");
-        System.out.println("2 - Gerar uma senha forte aleatória");
-        System.out.print("Escolha uma opção: ");
-        String opcao = sc.nextLine();
+        while(!opcaoValida) {
+            System.out.println("1 - Verificar uma senha");
+            System.out.println("2 - Gerar uma senha forte aleatória");
+            System.out.print("Escolha uma opção: ");
+            String opcao = sc.nextLine();
 
-        if (opcao.equals("1")) {
-            System.out.print("Digite uma senha para verificar: ");
-            String senha = sc.nextLine();
-            System.out.println("\nResultado da validação:");
-            System.out.println(validPassword(senha));
-            System.out.println("\nÉ uma senha forte? " + isPwStrong(senha));
+            switch(opcao){
+            case "1":
+                System.out.print("Digite uma senha para verificar: ");
+                String senha = sc.nextLine();
+                System.out.println("\nResultado da validação:");
+                System.out.println(validPassword(senha));
+                System.out.println("\nÉ uma senha forte? " + isPwStrong(senha));
+                opcaoValida = true;
+                break;
 
-        } else if (opcao.equals("2")) {
-            System.out.print("Digite o tamanho desejado (mínimo 8, Enter para usar 12): ");
-            String entradaTamanho = sc.nextLine();
-            int tamanho = entradaTamanho.isBlank() ? TAMANHO_PADRAO : Integer.parseInt(entradaTamanho);
+            case "2":
+                System.out.print("Digite o tamanho desejado (mínimo 8, Enter para usar 12): ");
+                String entradaTamanho = sc.nextLine();
+                int tamanho = entradaTamanho.isBlank()
+                    ? TAMANHO_PADRAO 
+                    : Integer.parseInt(entradaTamanho);
 
-            String senhaGerada = genStrongPw(tamanho);
-            System.out.println("\nSenha sugerida: " + senhaGerada);
-            System.out.println("É forte? " + isPwStrong(senhaGerada));
+                String senhaGerada = genStrongPw(tamanho);
+                System.out.println("\nSenha sugerida: " + senhaGerada);
+                System.out.println("É forte? " + isPwStrong(senhaGerada));
+                opcaoValida = true;
+                break;
+
+           default:
+                System.out.println("Escolha uma opção entre 1 e 2.");
+             break;
+            }   
         }
-        // corrigir else e else if para o programa fechar somente quando a necessidade for suprida. O objetivo vai ser evitar mensagem de erro por algo que pode casualmente acontecer (Digitar um número >8 por desatenção ao aviso).
         sc.close();
     }
 }
