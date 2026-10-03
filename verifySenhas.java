@@ -1,4 +1,10 @@
 
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Scanner;
 import java.util.regex.Pattern;
@@ -17,25 +23,114 @@ public class verifySenhas {
 
     private static final SecureRandom RANDOM = new SecureRandom();
 
-    public static boolean isPwStrong(String password) {
-        if (password == null) {
-            return false;
+    public class VerificadorVazamento {
+
+    private static final HttpClient CLIENT = HttpClient.newHttpClient();
+
+    /**
+     * Verifica se a senha já apareceu em vazamentos conhecidos.
+     * Retorna quantas vezes ela foi vista (0 = nunca vazou).
+     */
+    public static int contarVazamentos(String password) {
+        try {
+            String hashCompleto = sha1(password);
+            String prefixo = hashCompleto.substring(0, 5);
+            String sufixo = hashCompleto.substring(5);
+
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create("https://api.pwnedpasswords.com/range/" + prefixo))
+                    .header("Add-Padding", "true") // mitiga ataques de análise de tamanho da resposta
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = CLIENT.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() != 200) {
+                System.err.println("Aviso: API retornou status " + response.statusCode() + ". Pulando verificação de vazamento.");
+                return -1; // -1 indica "não foi possível verificar"
+            }
+
+            for (String linha : response.body().split("\n")) {
+                String[] partes = linha.trim().split(":");
+                if (partes.length == 2 && partes[0].equalsIgnoreCase(sufixo)) {
+                    return Integer.parseInt(partes[1]);
+                }
+            }
+
+            return 0; // não encontrado = nunca vazou (até onde se sabe)
+
+        } catch (Exception e) {
+            System.err.println("Aviso: erro ao consultar API de vazamentos (" + e.getMessage() + "). Continuando sem essa verificação.");
+            return -1;
         }
-        return Pattern.matches(REGEX_STRONG_PASSWORD, password);
     }
+
+    private static String sha1(String texto) throws NoSuchAlgorithmException {
+        MessageDigest md = MessageDigest.getInstance("SHA-1");
+        byte[] hashBytes = md.digest(texto.getBytes());
+
+        StringBuilder hex = new StringBuilder();
+        for (byte b : hashBytes) {
+            hex.append(String.format("%02X", b)); // maiúsculo, igual ao formato da API
+        }
+        return hex.toString();
+    }
+}
+
+    public static boolean isPwStrong(String password) {
+    if (password == null) {
+        return false;
+    }
+    if (!Pattern.matches(REGEX_STRONG_PASSWORD, password)) {
+        return false;
+    }
+    if (temSequenciaOuRepeticao(password)) {
+        return false;
+    }
+    return true;
+}
+
+        
+
+    private static boolean temSequenciaOuRepeticao(String password) {
+    if (password == null || password.length() < 3) return false;
+
+    for (int i = 0; i < password.length() - 2; i++) {
+        char a = password.charAt(i);
+        char b = password.charAt(i + 1);
+        char c = password.charAt(i + 2);
+
+        // Repetição: "aaa", "111"
+        if (a == b && b == c) {
+            return true;
+        }
+
+        // Sequência crescente: "123", "abc"
+        if (b == a + 1 && c == b + 1) {
+            return true;
+        }
+
+        // Sequência decrescente: "321", "cba"
+        if (b == a - 1 && c == b - 1) {
+            return true;
+        }
+    }
+    return false;
+}
     
     public static String validPassword(String password){
         StringBuilder error = new StringBuilder();
+        int vezesVazada = VerificadorVazamento.contarVazamentos(password);
 
         if (password == null || password.length() < 8){
             error.append("- A senha deve ter no mínimo 8 caracteres.\n");
         }
 
         if(password==null || !password.matches(".*[a-z].*")){
-            error.append("- A senha deve conter caracteres mínusculos.\n");
+            error.append("- A senha deve conter caracteres minúsculos.\n");
         }
         if(password==null || !password.matches(".*[A-Z].*")){
-            error.append("- A senha precisa conter caracteres maiusculos.\n");
+            error.append("- A senha precisa conter caracteres maiúsculos.\n");
         }
         if(password==null || !password.matches("(?=(?:.*\\d){2,}).*")){
             error.append("- A senha precisa conter no mínimo 2 números.\n");
@@ -43,13 +138,23 @@ public class verifySenhas {
         if(password==null || !password.matches("(?=(?:.*[@#$%^&+=!.,_-]){2,}).*")){
             error.append("- A senha precisa ter no minimo 2 caracteres especiais. (Use: @#$%^&+=!.,_-)\n");
         }
-        if(password != null && !password.matches("[A-Za-z\\d@#$%^&+=!.,_-]+")){
+        if(password != null && !password.matches("[A-Za-z\\d@ #$%^&+=!.,_-]+")){
             error.append("- A senha contém caracteres não permitidos. (Use apenas: @#$%^&+=!.,_-)\n");
         }
         if(password==null || password.contains(" ")){
             error.append("- A senha não pode conter espaços.\n");
         }
-        return error.length() == 0 ? "Senha forte!" : error.toString();
+        if (temSequenciaOuRepeticao(password)) {
+            error.append("- A senha não pode conter sequências (ex: 123, abc) nem repetições (ex: aaa).\n");
+        }
+        if (vezesVazada > 0) {
+            error.append("- Essa senha já apareceu em " + vezesVazada + " vazamentos conhecidos. Escolha outra.\n");   
+        }
+    // vezesVazada == -1 significa que a API falhou; nesse caso, o programa
+    // continua sem bloquear por esse motivo (fail-safe, para não travar o
+    // usuário por causa de uma instabilidade de rede)
+
+    return error.length() == 0 ? "Senha forte!" : error.toString();
     }
 
     public static String genStrongPw(){
@@ -59,6 +164,9 @@ public class verifySenhas {
     public static String genStrongPw(int lngth){
         if (lngth < 8) {
             throw new IllegalArgumentException("O tamanho mínimo para uma senha forte é 8.");
+        }
+        if (lngth > 20) {
+            throw new IllegalArgumentException("O tamanho máximo para uma senha é 20.");
         }
         StringBuilder password = new StringBuilder(lngth);
 
