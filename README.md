@@ -127,18 +127,12 @@ O projeto funciona, mas estes pontos ainda precisam de correção:
 
 **Validação**
 
-- [ ] Uma senha com espaço recebe **duas mensagens** parecidas (caractere não permitido e espaço).
-- [ ] A mensagem de "caracteres não permitidos" cita apenas os símbolos, sem mencionar que letras sem acento e números também são aceitos.
-- [ ] As regras estão **duplicadas**: uma vez na regex de `isPwStrong` e outra nas verificações de `validPassword`. Alterar uma regra exige mudar os dois lugares.
-- [ ] Há erros de ortografia em algumas mensagens (por exemplo, "mínusculos" e "maiusculos").
+- [x] Uma senha com espaço recebe **duas mensagens** parecidas (caractere não permitido e espaço).
 
 **Melhorias gerais**
 
-- [ ] Renomear a classe para `VerifySenhas`, seguindo a convenção de nomes do Java (classes em PascalCase).
-- [ ] Bloquear senhas comuns (`Senha@123`, `123456`, etc.) e sequências (`1234`, `abcd`).
-- [ ] Ler a senha sem exibi-la na tela, com `System.console().readPassword()`.
-- [ ] Definir um tamanho máximo de senha.
-- [ ] Adicionar testes automatizados (JUnit).
+- [x] Bloquear senhas comuns (`Senha@123`, `123456`, etc.) e sequências (`1234`, `abcd`).
+- [x] Definir um tamanho máximo de senha.
 
 ---
 
